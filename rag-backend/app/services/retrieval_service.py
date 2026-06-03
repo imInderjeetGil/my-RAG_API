@@ -13,6 +13,6 @@ def search_documents(query: str):
     # print(len(embedding))
     
     return {
-    "documents": results["documents"][0:10],
-    "distances": results["distances"][0:10]
+    "documents": results["documents"][0],
+    "distances": results["distances"][0]
 }

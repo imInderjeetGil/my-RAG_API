@@ -28,6 +28,10 @@ function App() {
   }
 );
 
+    if (!response.ok) {
+      throw new Error("Request failed");
+    }
+
     const data = await response.json();
 
     const aiMessage = {
@@ -81,7 +85,7 @@ function App() {
 ]);
 
   } catch (error) {
-    setUploadStatus("Upload failed");
+    console.error(error);
   }
 }
   

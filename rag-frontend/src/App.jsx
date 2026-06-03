@@ -29,7 +29,7 @@ function App() {
 );
 
     if (!response.ok) {
-      throw new Error("Request failed");
+      throw new Error(`Request failed with status ${response.status}`);
     }
 
     const data = await response.json();
@@ -86,6 +86,14 @@ function App() {
 
   } catch (error) {
     console.error(error);
+    setMessages(prev => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: "Upload failed.",
+      },
+    ]);
   }
 }
   

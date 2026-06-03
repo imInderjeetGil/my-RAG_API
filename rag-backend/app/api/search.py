@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from services.retrieval_service import search_documents
 
 router = APIRouter()
+MAX_ANSWER_SNIPPET_LENGTH = 300
 
 class SearchRequest(BaseModel):
     query: str
@@ -27,6 +28,11 @@ def ask(question: str = Query(...)):
 
     answer_parts = []
     for index, doc in enumerate(documents[:3], start=1):
-        answer_parts.append(f"{index}. {doc.strip()[:300]}")
+        snippet = doc.strip()
+        if len(snippet) > MAX_ANSWER_SNIPPET_LENGTH:
+            head = snippet[:MAX_ANSWER_SNIPPET_LENGTH]
+            truncated = head.rsplit(" ", 1)[0] if " " in head else head
+            snippet = truncated.strip() + "..."
+        answer_parts.append(f"{index}. {snippet}")
 
     return {"answer": "\n\n".join(answer_parts)}

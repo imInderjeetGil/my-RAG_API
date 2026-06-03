@@ -12,7 +12,10 @@ def search_documents(query: str):
     # embedding = generate_embedding("Hello")
     # print(len(embedding))
     
+    documents = results.get("documents", [])
+    distances = results.get("distances", [])
+
     return {
-    "documents": results["documents"][0],
-    "distances": results["distances"][0]
+    "documents": documents[0] if documents else [],
+    "distances": distances[0] if distances else []
 }

@@ -1,0 +1,1795 @@
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 1 
+ 
+UNIT – I            
+OPERATING SYSTEMS OVERVIEW: Introduction-operating system operations, process 
+management,memory management, storage management, protection and security, System 
+structures-Operating system services, systems calls, Types of system calls, system programs 
+(T1: Ch-1, 2) (1.1-1.9, 2.1-2.5) 
+ 
+What is an Operating System? 
+A program that acts as an intermediary between a user of a computer and the computer 
+hardware 
+Operating system goals: 
+• Execute user programs and make solving user problems easier 
+• Make the computer system convenient to use 
+• Use the computer hardware in an efficient manner 
+Computer System Structure 
+Computer system can be divided into four components 
+• Hardware – provides basic computing resources 
+CPU, memory, I/O devices 
+• Operating system 
+Controls and coordinates use of hardware among various applications and users 
+• Application programs – define the ways in which the system resources are used to 
+solve the computing problems of the users 
+Word processors, compilers, web browsers, database systems, video games 
+• Users 
+People, machines, other computers 
+Four Components of a Computer System 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 2 
+ 
+Operating System Definition 
+• An operating system as a resource allocator. A computer system has many resources 
+that may be required to solve a problem: CPU time, memory space, ﬁle -storage space, 
+I/O devices, and so on. The operating system acts as the manager of these resources. 
+• Decides between conflicting requests for efficient and fair resource use 
+• OS is a control program A control program manages the execution of user programs 
+to prevent errors and improper use of the computer. It is especially concerned  with 
+the operation and control of I/O devices. 
+• “OS is t he one program running at all times on the computer” is the kernel.  
+Everything else is either a system program (ships with the operating system) or an 
+application program 
+• System programs which are associated with the operating system but are not part of 
+the kernel, and application programs which include all programs not associated with 
+the operation of the system.) 
+ 
+Computer Startup 
+• bootstrap program is loaded at power-up or reboot 
+• Typically stored in ROM or EPROM, generally known as firmware 
+• Initializes all aspects of system 
+• Loads operating system kernel and starts execution 
+• Once the kernel is loaded and executing, it can start providing services to the system 
+and its users. Some services  are provided outside of the kernel, by system programs 
+that are loaded into memory at boot time to become system processes,  or system 
+daemons that run the entire time the kernel is running. On UNIX, the ﬁrst system 
+process is “init,” and it starts many ot her daemons. Once this phase is complete, the 
+system is fully booted, and the system waits for some event to occur. 
+ 
+Computer System Organization 
+• Computer-system operation 
+• One or more CPUs, device controllers connect through common bus providing access 
+to shared memory 
+• Concurrent execution of CPUs and devices competing for memory cycles 
+ 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 3 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Computer-System Operation 
+• I/O devices and the CPU can execute concurrently 
+• Each device controller has a local buffer 
+• CPU moves data from/to main memory to/from local buffers 
+• Device controller informs CPU that it has finished its operation by causing An interrupt 
+• The occurrence of an event is usually signaled by an Interrupt from either the 
+hardware or the software. Hardware may trigger an interrupt at any time by sending a 
+signal to the CPU, usually by way of the system bus. Software may trigger an interrupt 
+executing a special operation called a System call (also called a monitor call) 
+ 
+Common Functions of Interrupts 
+• Interrupt transfers control to the interrupt service routine generally, through the 
+interruptvector, which contains the addresses of all the service routines 
+• Interrupt architecture must save the address of the interrupted instruction 
+• Incoming interrupts are disabled while another interrupt is being processed to prevent 
+a lost interrupt. A trap is a software-generated interrupt caused either by an error or a 
+user request 
+• An operating system is interrupt driven 
+ 
+Interrupt Handling 
+• The operating system preserves the state of the CPU by storing registers and the 
+program counter 
+• Determines which type of interrupt has occurred: 
+• Separate segments of code determine what action should be taken for each type of 
+interrupt 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 4 
+ 
+Interrupt Timeline 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+I/O Structure 
+• A general-purpose computer system consists of CPUs and multiple device controllers 
+that are connected through a common bus. Each device controller is in charge of a 
+speciﬁc type of device. Depending on the controller, more than one device may be 
+attached. For instance, seven or more devices can be attached to the small computer -
+systems interface (SCSI) controller.  
+• A device controller maintains some local buffer storage and a set of special -purpose 
+registers. The device controller is responsible for moving the data between the 
+peripheral devices that it controls and its local buffer storage. Typically, operating 
+systems have a device driver for each device controller. This device driver 
+understands the device controller and provides the rest of the operating  system with a 
+uniform interface to the device. 
+• To start an I/O operation, the device driver loads the appropriate registers within the 
+device controller. The device controller, in turn, ex amines the contents of these 
+registers to determine what action to take (such as “read a character from the 
+keyboard”). The controller starts the transfer of data from the device to its local buffer. 
+Once the transfer of data is complete, the device contro ller informs the device driver 
+via an interrupt that it has ﬁnished its operation. The device driver then returns 
+control to the operating system, possibly returning the data or a pointer to the data if 
+the operation was a read.  For other operations, the d evice driver returns status 
+information. 
+• System call – request to the operating system to allow user to wait for I/O completion 
+• Device-status table contains entry for each I/O device indicating its type, address, 
+and state 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 5 
+ 
+• Operating system indexes into I/O device table to determine device status and to 
+modify table entry to include interrupt 
+ 
+Storage Structure 
+The CPU can load instructions only from memory, so any programs to run must be stored 
+there. General -purpose computers run most of their program s from rewriteable memory, 
+called main memory (also called or RAM). Main commonly is implemented in a 
+semiconductor technology called DRAM. 
+ 
+All forms of memory provide an array of words. Each word has its own address. 
+Interaction is achieved through a sequence of load or store instructions to specific memory 
+addresses. The load instruction moves a word from main memory to an internal register 
+within the CPU, whereas the store instruction moves the content of a register to main 
+memory. 
+ 
+Ideally, we want the programs and data to reside in main memory permanently. This 
+arrangement usually is not possible for the following two reasons: 
+1) Main memory is usually too small to store all needed programs and data permanently. 
+2) Main memory is a volatile stor age device that loses its contents when power is turned 
+off or otherwise lost. 
+Thus, most computer systems provide secondary storage as an extension of main memory. 
+The main requirement for secondary storage is that it be able to hold large quantities of d ata 
+permanently. The most common secondary -storage device is a magnetic disk  which 
+provides storage for both programs and data. 
+ 
+• Main memory – only large storage media that the CPU can access directly 
+• Secondary storage – extension of main memory that provides large nonvolatile storage 
+capacity 
+• Magnetic disks – rigid metal or glass platters covered with magnetic recording 
+material  
+ 
+Storage Hierarchy 
+• Storage systems organized in hierarchy 
+• Speed 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 6 
+ 
+• Cost 
+• Volatility 
+Caching – copying information into faster storage system; main memory can be viewed as a 
+last cache for secondary storage 
+ 
+ 
+Computer-System Architecture 
+• Most systems use a single general-purpose processor (PDAs through mainframes) 
+• Most systems have special-purpose processors as well 
+• Multiprocessors systems growing in use and importance 
+• Also known as parallel systems, tightly-coupled systems 
+Advantages include 
+1.Increased throughput 
+2.Economy of scale 
+3.Increased reliability – graceful degradation or fault tolerance 
+Two types 
+1.Asymmetric Multiprocessing 
+2.Symmetric Multiprocessing 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 7 
+ 
+ 
+ 
+How a Modern Computer Works 
+Symmetric Multiprocessing Architecture 
+ 
+ 
+ 
+ 
+ 
+ 
+Multiprocessing adds CPUs to increase computing power. If the CPU has an integrated 
+memory controller, then adding CPUs can also increase the amount of memory addressable in 
+the system. Either way, multiprocessing can cause a system to change its memory access 
+model from uniform memory access to non -uniform memory access UMA is defined as the 
+situation in which access to any RAM fro m any CPU takes the same amount of time. With 
+NUMA, some parts of memory may take longer to access than other parts, creating a 
+performance penalty. Operating systems can minimize the NUMA penalty through resource 
+management. 
+ 
+ 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 8 
+ 
+A Dual-Core Design 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+We show a dual -core design with two cores on the samechip. In this design, each core has its 
+own register set as well as its own localcache; other designs might use a shared cache or a 
+combination of local andshared caches. 
+ 
+Blade servers are a recent development in which multiple processor boards, I/0 boards, and 
+networking boards are placed in the same chassis. The difference between these and 
+traditional multiprocessor systems is that each blade -processor board boots independently 
+and runs its own operating system. 
+ 
+Clustered Systems 
+Another type of multiprocessor system is a clustered system, which gathers  together multiple 
+CPUs. Clustered systems differ from the multiprocessor  systems (loosely coupled). Clustering 
+is usually used to provide high-availability service — that is, service will continue even if one 
+or more systems in the cluster fail. 
+ 
+Clustering can be structured asymmetrically or symmetrically.  In asymmetric clustering , 
+one machine is in hot-standby mode while the other is running the applications. The hot -
+standby host machine does nothing but monitor the active server. If that server fails, the hot -
+standby host becomes the active server. In symmetric  mode, two or more hosts are running 
+applications and are monitoring eac h other. This mode is obviously more efficient, as it uses 
+all of the available hardware. It does require that more than one application be available to 
+run. 
+ 
+However, applications must be written to take advantage of the cluster by using a technique 
+known as parallelization which consists of dividing a program into separate components 
+that run in parallel on individual computers in the cluster. 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 9 
+ 
+Because most operating systems lack support for simultaneous data access by multiple 
+hosts, parallel clusters are  usually accomplished by use of special versions of software and 
+special releases of applications. For example, Oracle Real Application Cluster is a version of 
+Oracle's database that has been designed to run on a parallel cluster. Each machine runs 
+Oracle, and a layer of software tracks access to the shared disk. Each machine has full access 
+to all data in the database. To provide this shared access to data, the system must also supply 
+access control and locking to ensure that no conflicting operations occu r. This function, 
+commonly known as a is distributed lock manager (DLM). 
+ 
+ 
+Operating System Structure 
+• Multiprogramming needed for efficiency 
+• Single user cannot keep CPU and I/O devices busy at all times 
+• Multiprogramming organizes jobs (code and data) so CPU always has one to Execute a 
+subset of total jobs in system is kept in memory 
+• Main memory is too small to accommodate all jobs, the jobs are kept initially on the 
+disk in the Job pool . This pool consists of all processes residing on disk awaiting 
+allocation of main memory. 
+• The operating system picks and begins to execute one of the jobs in memory. 
+• One job selected and run via job scheduling 
+• When it has to wait (for I/O for example), OS switches to another job 
+• Timesharing (multitasking) is logical extensi on in which CPU switches jobs so 
+frequently that users can interact with each job while it is running, creating 
+interactive computing 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 10 
+ 
+Memory Layout for Multi programmed System 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Time sharing (or multitasking) is a logical extension of multiprogramming. In time -sharing 
+systems, the CPU executes multiple jobs by switching among them, but the switches occur so 
+frequently that the users can interact with each program while it is running. 
+ 
+Time sharing requires an interactive computer system , which provides direct 
+communication between the user and the system. The user gives instructions to the operating 
+system or to a program directly, using a input device such as a keyboard, mouse, touch pad, or 
+touch screen, and waits for immediate results  on an output device. Accordingly, the response 
+time should be short—typically less than one second. 
+ 
+A time -shared operating system allows many users to share the computer 
+simultaneously. Since each action or command in a time-shared system tends to be short, only 
+a little CPU time is needed for each user.A program loaded into memory and executing is 
+called a process. When a process executes, it typically executes for only a short time before it 
+either finishes or needs to perform I/O. 
+ 
+Time sharing and multiprogramming require that several jobs be kept  simultaneously 
+in memory. If several jobs are ready to be brought into memory,and if there is not enough 
+room for all of them, then the system must chooseamong them. Making this decision involves 
+job scheduling. 
+ 
+If several jobs are ready to run at the same time, the system must choose which job 
+will run first. Making this decision is CPU scheduling. In a time-sharing system, the operating 
+system must ensure reasonable response time. This goal is sometimes accomplished through 
+swapping, whereby processes are swapped in and out of main memory to the disk. 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 11 
+ 
+A more common method for ensuring reasonable response time is virtual memory, a 
+technique that allows the execution of a process that is not completely in m emory. The main 
+advantage of the virtual -memory scheme is that it enables users to run programs that are 
+larger than actual physical memory 
+ 
+Operating-System Operations 
+Modern operating systems are interrupt driven. If there are no processes to execute, no I/O 
+devices to service, and no users to whom to respond, an operating system will sit quietly, 
+waiting for something to happen. Events are almost always signaled by the  occurrence of an 
+interrupt or a trap. A trap (or an exception) is a software-generated interrupt caused either 
+by an error (for example, division by zero or invalid memory access) or by a specific request 
+from a user program that an operating -system servi ce be performed. For each type of 
+interrupt, separate segments of code in the operating system determine what action should 
+be taken. An interrupt service routine is provided to deal with the interrupt. 
+ 
+Transition from User to Kernel Mode 
+At the very least, we need two separate modes of operation: user mode and kernel mode (also 
+called supervisor mode, system mode, or privileged mode). A bit, called the mode bit, is added 
+to the hardware of the computer to indicate the current mode: kernel (0) or user (1). With the 
+mode bit, we can distinguish between a task that is executed on behalf of the operating 
+system and one that is executed on behalf of the user. When the computer system is executing 
+on behalf of a user application, the system is in user mode. Howe ver, when a user application 
+requests a service from the operating system (via a system call), the system must transition 
+from user to kernel mode to fulfill the request. 
+ 
+At system boot time, the hardware starts in kernel mode. The operating system is the n 
+loaded and starts user applications in user mode. Whenever a trap or interrupt occurs, the 
+hardware switches from user mode to kernel mode (that is, changes the state of the mode bit 
+to 0). Thus, whenever the operating system gains control of the compute r, it is in kernel 
+mode. The system always switches to user mode (by setting the mode bit to 1) before passing 
+control to a user program. 
+ 
+The hardware allows privileged instructions to be executed only in kernel mode. If an 
+attempt is made to execute a privileged instruction in user mode, the hardware does not 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 12 
+ 
+execute the instruction but rather treats it as illegal and traps it to the operat ing system. The 
+instruction to switch to kernel mode is an example of a privileged instruction. Some other 
+examples include I/O control, timer management, and interrupt management. 
+ 
+System calls provide the means for a user program to ask the operating sys tem to 
+perform tasks reserved for the operating system on the user program’s behalf. A system call 
+is invoked in a variety of ways, depending on the functionality provided by the underlying 
+processor. In all forms, it is the method used by a process to req uest action by the operating 
+system. A system call usually takes the form of a trap to a specific location in the interrupt 
+vector. This trap can be executed by a generic trap instruction, although some systems (such 
+as MIPS) have a specific syscall instruction to invoke a system call. 
+ 
+When a system call is executed, it is typically treated by the hardware as a software 
+interrupt. Control passes through the interrupt vector to a service routine in the operating 
+system, and the mode bit is set to kernel mod e. The system-call service routine is a part of the 
+operating system. The kernel examines the interrupting instruction to determine what 
+system call has occurred; a parameter indicates what type of service the user program is 
+requesting. 
+ 
+Timer  
+We must ensure that the operating system maintains control over the CPU. We cannot allow a 
+user program to get stuck in an infinite loop or to fail to call system services and never return 
+control to the operating system. To accomplish this goal, we can use a timer . A timer can be 
+set to interrupt the computer after a specified period. The period may be fixed (for example, 
+1/60 second) or variable (for example, from 1 millisecond to 1 second). A variable timer is 
+generally implemented by a fixed -rate clock and a cou nter. The operating system sets the 
+counter. Every time the clock ticks, the counter is decremented. When the counter reaches 0, 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 13 
+ 
+an interrupt occurs. For instance, a 10 -bit counter with a 1 -millisecond clock allows 
+interrupts at intervals from 1 millisecon d to 1,024 milliseconds, in steps of 1 millisecond. We 
+can use the timer to prevent a user program from running too long. 
+ 
+Process Management 
+A program does nothing unless its instructions are executed by a CPU. A program in 
+execution, as mentioned, is a p rocess. A time -shared user program such as a compiler is a 
+process. A word -processing program being run by an individual user on a PC is a process. A 
+system task, such as sending output to a printer, can also be a process (or at least part of one). 
+ 
+A proc ess needs certain resources —including CPU time, memory, files, and I/O 
+devices—to accomplish its task. These resources are either given to the process when it is 
+created or allocated to it while it is running. In addition to the various physical and logica l 
+resources that a process obtains when it is created, various initialization data (input) may be 
+passed along. 
+ 
+A single-threaded process has one program counter specifying the next instruction to 
+execute. The execution of such a process must be sequentia l. The CPU executes one 
+instruction of the process after another, until the process completes. A multithreaded process 
+has multiple program counters, each pointing to the next instruction to execute for a given 
+thread. 
+ 
+A process is the unit of work in a system. A system consists of a collection of processes, 
+some of which are operating -system processes (those that execute system code) and the rest 
+of which are user processes (those that execute user code). 
+ 
+The operating system is responsible for the follo wing activities in connection with process 
+management:  
+Process Management Activities 
+• Scheduling processes and threads on the CPUs  
+• Creating and deleting both user and system processes  
+• Suspending and resuming processes  
+• Providing mechanisms for process synchronization  
+• Providing mechanisms for process communication 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 14 
+ 
+• A process is a program in execution. It is a unit of work within the system. Program is a 
+passive entity, process is an active entity. 
+• Process needs resources to accomplish its task 
+• Process termination requires reclaim of any reusable resources 
+• Single-threaded process has one program counter specifying location of next 
+instruction to execute 
+• Process executes instructions sequentially, one at a time, until completion 
+• Multi-threaded process has one program counter per thread 
+• Typically system has many processes, some user, some operating system running 
+concurrently on one or more CPUs 
+ 
+Memory Management 
+The main memory is central to the operation of a modern computer system. Main memory is 
+a large array of bytes, ranging in size from hundreds of thousands to billions. Each byte has its 
+own address. Main memory is a repository of quickly accessible data shared by the CPU and 
+I/O devices. The central processor reads instructions from main memory during the 
+instruction-fetch cycle and both reads and writes data from main memory during the data -
+fetch cycle.  
+ 
+For a program to be executed, it must be mapped to absolute  addresses and loaded 
+into memory. As the program executes, it accesses program instructions and data from 
+memory by generating these absolute addresses. Eventually, the program terminates, its 
+memory space is declared available, and the next program can be loaded and executed. 
+ 
+To improve both the utilization of the CPU and the speed of the computer’s response to its 
+users, general -purpose computers must keep several programs in memory, creating a need 
+for memory management. 
+ 
+Memory management activities 
+• Keeping track of which parts of memory are currently being used and by whom 
+• Deciding which processes (or parts thereof) and data to move into and out of memory 
+• Allocating and deallocating memory space as needed 
+ 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 15 
+ 
+Storage Management 
+To make the computer system convenient for users, the operating system provides a uniform, 
+logical view of information storage. The operating system abstracts from the physical 
+properties of its storage devices to define a logical storage unit, the file. The operating system 
+maps files onto physical media and accesses these files via the storage devices. 
+ 
+File-System Management 
+File management is one of the most visible components of an operating system. Computers 
+can store information on several different types of physical media.  Magnetic disk, optical disk, 
+and magnetic tape are the most common. Each of these media has its own characteristics and 
+physical organization. Each medium is controlled by a device, such as a disk drive or tape 
+drive, that also has its own unique characte ristics. These properties include access speed, 
+capacity, data-transfer rate, and access method (sequential or random).  
+ 
+A file is a collection of related information defined by its creator. Commonly, files 
+represent programs (both source and object forms ) and data. Data files may be numeric, 
+alphabetic, alphanumeric, or binary. 
+ 
+OS File Management activities 
+• Creating and deleting files and directories 
+• Primitives to manipulate files and directories 
+• Mapping files onto secondary storage 
+• Backup files onto stable (non-volatile) storage media 
+ 
+Mass-Storage Management 
+The operating system is responsible for the following activities in connection with disk 
+management:  
+• Free-space management  
+• Storage allocation  
+• Disk scheduling 
+ 
+Magnetic tape drives and their tapes and CD and DVD drives and platters are typical tertiary 
+storage devices. 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 16 
+ 
+Caching 
+When we need a particular piece of information, we first check whether it is in the cache. If it 
+is, we use the information directly from the cache. If it is not, we use the information from the 
+source, putting a copy in the cache under the assumption that we will need it again soon. 
+ 
+In addition, internal programmable registers, such as index registers, provide a high -
+speed cache for main memory. The programmer (or compiler) implements the register -
+allocation and register-replacement algorithms to decide which information to keep in 
+registers and which to keep in main memory.  
+ 
+Other caches are implemented totally in hardware. For instance, most systems have an 
+instruction cache to hold the instructions expected to  be executed next. Without this cache, 
+the CPU would have to wait several cycles while an instruction was fetched from main 
+memory.Because caches have limited size, cache management is an important design 
+problem. Careful selection of the cache size and of  a replacement policy can result in greatly 
+increased performance. 
+ 
+Main memory can be viewed as a fast cache for secondary storage, since data in 
+secondary storage must be copied into main memory for use and data must be in main 
+memory before being moved to secondary storage for safekeeping. The file -system data, 
+which resides permanently on secondary storage, may appear on several levels in the storage 
+hierarchy. At the highest level, the operating system may maintain a cache of file -system data 
+in main memory. 
+ 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 17 
+ 
+I/O Subsystem 
+The I/O subsystem consists of several components:  
+• A memory-management component that includes buffering, caching, and spooling 
+ • A general device-driver interface  
+• Drivers for specific hardware devices 
+ 
+Protection and Security 
+Protection, then, is any mechanism for controlling the access of processes or users to the 
+resources defined by a computer system. 
+ 
+Protection and security require the system to be able to distinguish among all its users. 
+Most operating systems ma intain a list of user names and associated user identifiers (user 
+IDs). In Windows parlance, this is a security ID (SID). These numerical IDs are unique, one per 
+user. When a user logs in to the system, the authentication stage determines the appropriate 
+user ID for the user. That user ID is associated with all of the user’s processes and threads. 
+When an ID needs to be readable by a user, it is translated back to the user name via the user 
+name list. 
+ 
+In some circumstances, we wish to distinguish among set s of users rather than individual 
+users. For example, the owner of a file on a UNIX system may be allowed to issue all 
+operations on that file, whereas a selected set of users may be allowed only to read the file. To 
+accomplish this, we need to define a gr oup name and the set of users belonging to that group. 
+Group functionality can be implemented as a system -wide list of group names and group 
+identifiers. A user can be in one or more groups, depending on operating -system design 
+decisions. The user’s group IDs are also included in every associated process and thread. 
+• Systems generally first distinguish among users, to determine who can do what 
+• User identities (user IDs, security IDs) include name and associated number, one per 
+user 
+• User ID then associated wi th all files, processes of that user to determine access 
+control 
+• Group identifier ( group ID) allows set of users to be defined and controls managed, 
+then also associated with each process, file 
+• Privilege escalation allows user to change to effective ID with more rights 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 18 
+ 
+Operating-System Services 
+An operating system provides an environment for the execution of programs.  It provides 
+certain services to programs and to the users of those programs.  The specific services 
+provided, of course, differ from one operating system to another, but we can identify common 
+classes. 
+ 
+ 
+User interface. Almost all operating systems have a user interface (UI). This interface can 
+take several forms. One is a command-line interface (CLI), which uses text commands and a 
+method for entering them (say,  a keyboard for typing in commands in a specific format with 
+specific options). Another is a batch interface, in which commands and directives  to control 
+those commands are entered into files, and those files ar e executed. Most commonly, a 
+graphical user interface (GUI) is used. Here,  the interface is a window system with a 
+pointing device to direct I/O,  choose from menus, and make selections and a keyboard to 
+enter text. 
+• Program execution. The system must be abl e to load a program into  memory and to run 
+that program. The program must be able to end its  execution, either normally or 
+abnormally (indicating error). 
+• I/O operations. A running program may require I/O, which may involve a  file or an I/O 
+device. For specific devices, special functions may be desired (such as recording to a CD or 
+DVD drive or blanking a display screen). For  efficiency and protection, users usually 
+cannot control I/O devices directly.  Therefore, the operating system must provide a 
+means to do I/O. 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 19 
+ 
+• File-system manipulation. The file system is of particular interest. Obviously,  programs 
+need to read and write files and directories. They also  need to create and delete them by 
+name, search for a given file, and  list file information. Fi nally, some operating systems 
+include permissions management to allow or deny access to files or directories based on 
+file ownership. 
+• Communications. There are many circumstances in which one process needs to exchange 
+information with another process. Such  communication may occur between processes 
+that are executing on the same computer or  between processes that are executing on 
+different computer systems tied  together by a computer network. Communications may 
+be implemented via shared memory, in which two or more processes read and write to  a 
+shared section of memory, or message passing , in which packets of  information in 
+predefined formats are moved between processes by the operating system. 
+• Error detection . The operating system needs to be detecting and c orrecting errors 
+constantly. Errors may occur in the CPU and memory hardware (such  as a memory error 
+or a power failure), in I/O devices (such as a parity error  on disk, a connection failure on a 
+network, or lack of paper in the printer),  and in the user p rogram (such as an arithmetic 
+overflow, an attempt to access an illegal memory location, or a too -great use of CPU time). 
+For each type of error, the operating system should take the appropriate action  to ensure 
+correct and consistent computing. 
+• Resource allocation. When there are multiple users or multiple jobs  running at the same 
+time, resources must be allocated to each of them. The  operating system manages many 
+different types of resources. Some (such  as CPU cycles, main memory, and file stora ge) 
+may have special allocation  code, whereas others (such as I/O devices) may have much 
+more general request and release code. For instance, in determining how best to use  the 
+CPU, operating systems have CPU -scheduling routines that take into  account the speed of 
+the CPU, the jobs that must be executed, the number of  registers available, and other 
+factors. 
+• Accounting. We want to keep track of which users use how much and  what kinds of 
+computer resources. This record keeping may be used for accounting (so that users can be 
+billed) or simply for accumulating usage  statistics. Usage statistics may be a valuable tool 
+for researchers who wish to reconfigure the system to improve computing services. 
+• Protection and security . The owners of information stored in a m ultiuser or networked 
+computer system may want to control use of that information.  When several separate 
+processes execute concurrently, it should not be  possible for one process to interfere with 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 20 
+ 
+the others or with the operating  system itself. Protection involves ensuring that all access 
+to system resources is controlled. 
+ 
+User and Operating-System Interface 
+One provides a command -line interface, or command interpreter , that allows users  to 
+directly enter commands to be performed by the operating system. The other allows users to 
+interface with the operating system via a graphical user  interface, or GUI. interpreters are 
+known as shells. For example, on UNIX and Linux systems, a  user may choose among several 
+different shells, including the Bourne s hell, C shell, Bourne-Again shell , Korn shell , and 
+others. 
+The main function of the command interpreter is to get and execute the next  user-
+specified command. Many of the commands given at this level manipulate  files: create, delete, 
+list, print, copy, execute, and so on. The MS-DOS and UNIX shells operate in this way. 
+ 
+System Calls 
+System calls provide an interface to the services made available by an operating  system. 
+These calls are generally available as routines written in C and C++, although certain low-level 
+tasks (for example, tasks where hardware  must be accessed directly) may have to be written 
+using assembly -language instructions. An example to illustrate how system calls are used: 
+writing a simple program to read data from one file and copy them to another file. 
+ 
+Frequently, systems execute thousands of system calls  per second. Most programmers 
+never see this level of detail, however.  Typically, application developers design programs 
+according to an application programming interface (API). The API specifies a set of 
+functions that are available to an application programmer, including the parameters that are 
+passed to each function and t he return values the programmer can expect.  Three of the most 
+common APIs available to application programmers are  the Windows API for  Windows 
+systems, the POSIX API for POSIX-based systems (which include virtually all versions of UNIX, 
+Linux, and Mac OSX), and the Java  API for programs that run on the Java virtual machine. A 
+programmer accesses  an API via a library of code provided by the operating system. In the 
+case of UNIX and Linux for programs written in the C language, the library is called libc. 
+ 
+Behind the scenes, the functions that make up an API typically invoke the  actual 
+system calls on behalf of the application programmer. For example, the  Windows function 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 21 
+ 
+CreateProcess() (which unsurprisingly is used to create  a new process) actually invokes the 
+NTCreateProcess() system call in the Windows kernel. 
+ 
+ 
+ 
+ 
+For most programming languages, the run -time support system (a set of  functions built into 
+libraries included with a compiler) provides a system call interface that serves as the link to 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 22 
+ 
+system calls made available by the  operating system. The system -call interface intercepts 
+function calls in the API and invokes the necessary system calls within the operating system. 
+ 
+ 
+Types of System Calls 
+• Process control 
+• File management 
+• Device management 
+• Information maintenance 
+• Communications 
+• Protection 
+Process Control 
+A running program needs to be able to halt its execution either normally  (end()) or 
+abnormally ( abort()). If a system call is made to terminate the  currently running program 
+abnormally, or if the program runs into a problem  and causes an error trap, a dump of 
+memory is sometimes taken and an error message generated. The dump is written to disk and 
+may be examined by  a debugger—a system p rogram designed to aid the programmer in 
+finding and correcting errors, or bugs—to determine the cause of the problem. Under  either 
+normal or abnormal circumstances, the operating system must transfer  control to the 
+invoking command interpreter. The command interpreter then reads the next command.  
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 23 
+ 
+ 
+ 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 24 
+ 
+ 
+ 
+ 
+ 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 25 
+ 
+FreeBSD (derived from Berkeley UNIX) is an example of a multitasking  system. When a user 
+logs on to the system, the shell of the user’s choice  is run. This shell is similar to the MS -DOS 
+shell in that it accepts commands  and executes programs that the user requests. However, 
+since FreeBSD is a  multitasking system, the command interpreter may continue running 
+while another program is executed (Figure 2.10).  
+ 
+To start a new process, the shell  executes a fork() system call. Then, the selected program is 
+loaded into memory via an exec() system call, and the program is executed. Depending  on the 
+way the command was issued, the shell then either  waits for the process  to finish or runs the 
+process “in the background.” 
+ 
+File Management 
+We first need to be able to create() and delete() files. Either system call  requires the name of 
+the file and perhaps some of the file’s attributes. Once  the file is created, we need to open() it 
+and to use it. We may also read(), write(), or reposition() (rewind or skip to the end of the file, 
+for example). Finally, we need to close() the file, indicating that we are no longer using it. 
+ 
+Device Management 
+Process may need several resources to execute —main memory, disk drives,  access to files, 
+and so on. If the resources are available, they can be granted,  and control can be returned to 
+the user process. Otherwise, the process will  have to wait until sufficient res ources are 
+available. The various resources controlled by the operating system can be thought  of as 
+devices. Some of these devices are physical devices (for example, disk  drives), while others 
+
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 26 
+ 
+can be thought of as abstract or virtual devices (for  example, files).A system with multiple 
+users may require us to first request()  a device, to ensure exclusive use of it. After we are 
+finished with the device, we release() it. Once the device has been requested (and allocated to 
+us), we can read(), write(), and (possibly) reposition() the device, just as we can with files. 
+ 
+Information Maintenance 
+Many system calls exist simply for the purpose of transferring information  between the user 
+program and the operating system. For example, most  systems have a system call to return 
+the current time() and date(). Other  system calls may return information about the system, 
+such as the number of current users, the version number of the operating system, the amount 
+of free memory or disk space, and so on.  Another set of system calls is helpful in debugging a 
+program. Many systems provide system calls to dump() memory. This provision is useful for  
+debugging. 
+ 
+Communication 
+There are two common models of inter  process communication: the message  passing model 
+and the shared-memory model. In the message -passing model, the communicating processes 
+exchange messages with one another to transfer  information. Messages can be exchanged 
+between the processes either directly  or indirectly through a common mailbox. Before 
+communication can take place, a connection must be opened. 
+ 
+ Each computer in  a network has a host name by which it is commonly 
+known. A host also has a network identifier, such as an IP address. Similarly, each process has 
+a process name, and this name is trans lated into an identifier by which the operating  system 
+can refer to the process. The get hostid() and get processid()  system calls do this translation. 
+The identifiers are then passed to the generalpurpose open() and close() calls provided by the 
+file system or to specific open connection() and close connection() system calls, depending on 
+the system’s model of communication. The recipient process usually must give its  permission 
+for communication to take place with an accept connection() call. 
+ 
+In the shar ed-memory model, processes use shared memory create()  and shared memory 
+attach() system calls to create and gain access to regions  of memory owned by other 
+processes. 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 27 
+ 
+Protection 
+Protection provides a mechanism for controlling access to the resources provided by a 
+computer system.  Typically, system calls providing protection include set permission()  and 
+get permission(), which manipulate the permission settings of  resources such as files and 
+disks. The allow user() and deny user() system  calls specify whether particular users can —or 
+cannot—be allowed access to certain resources. 
+ 
+System Programs 
+System programs, also known as system utilities,  provide a convenient environment for 
+program development and execution. Some of them are simply user interfaces to system calls. 
+Others are considerably more complex. They can be divided into these categories: 
+• File management: These programs create, delete, copy, rename, print,  dump, list, and 
+generally manipulate files and directories. 
+• Status information: Some programs simply ask the system for the date,  time, amount 
+of available memory or disk space, number of users, or  similar status information. 
+Others are more complex, providing detailed  performance, logging, and debugging 
+information. 
+• File modification: Several text editors may be available to create and  modify the 
+content of files stored on disk or other storage devices. There  may also be special 
+commands to search contents of files or perform transformations of the text. 
+• Programming-language support : Compilers, assemblers, debuggers, and  
+interpreters for common programming languages (such as C, C++, Java,  and PERL) are 
+often provided with the operating system or available as a separate download. 
+• Program loading and execution : Once a program is assembled or compiled,  it must 
+be loaded into memory to be executed. The system may  provide absolute loaders, 
+relocatable loaders, linkage editors, and overlay  loaders. Debugging systems for either 
+higher-level languages or machine language are needed as well. 
+• Background services : All general -purpose systems have methods for  launching 
+certain system -program processes at boot time. Some of these  processes terminate 
+after completing their tasks, while others continue  to run until the system  is halted. 
+Constantly running system -program processes are known as services, subsystems, or 
+daemons. 
+ 
+UNIT-1 NOTES 
+ 
+Operating Systems Fundamentals  Page 28 
+ 
+Along with system programs, most operating systems are supplied with  programs that are 
+useful in solving common problems or performing common  operations. Such application 
+programs include Web browsers, word processors  and text formatters, spreadsheets, 
+database systems, compilers, plotting and statistical-analysis packages, and games. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 1 
+ 
+UNIT – II  
+PROCESS MANAGEMENT : Process concepts - Operations on processes, IPC, Process 
+Scheduling (T1: Ch-3). 
+PROCESS COORDINATION: Process synchronization - critical section problem, Peterson’s 
+solution, synchronization hardware, semaphores, classic problems of synchronization, 
+readers and writers problem, dining philosopher’s problem, monitors (T1: Ch-5). 
+Introduction 
+Process: 
+A process, which is a program  in execution. A process is the unit of work in a  modern 
+time-sharing system. A system therefore consists of a collection of processes: operating  
+system processes executing system code and user processes executing user  code. Potentially, 
+all these processes can execute concurrently, with the CPU (or  CPUs) multiplexed among 
+them. By switching the CPU between processes, the  operating system can make the computer 
+more productive.  
+A process is also known as job or task. A process is more than the program code, which 
+is sometimes known as the text section. It also includes the current activity, as represented 
+by the value of the program counter and the contents of the processor’s registers. A process 
+generally also includes the proc ess stack, which contains temporary data (such as function  
+parameters, return addresses, and local variables), and a data section, which contains global 
+variables. A process may also include a heap, which is memory  that is dynamically allocated 
+during process run time. The structure of a process in memory is shown in Figure 3.1. 
+ 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 2 
+ 
+ 
+We emphasize that a program by itself is not a process. A program is a  passive entity, such as 
+a file containing a list of instructions stored on disk  (often called an executable file ). In 
+contrast, a process is an active entity, with a program counter specifying the next instruction 
+to execute and a set  of associated resources. A program becomes a process when an 
+executable file is loaded into memory. 
+ 
+Process State 
+As a process executes, it changes state. The state of a process is defined in part  by the current 
+activity of that process. A process may be in one of the following states: 
+• New. The process is being created. 
+• Running. Instructions are being executed. 
+• Waiting. The process is waiting for some event to occur (such as an I/O 
+completion or reception of a signal). 
+• Ready. The process is waiting to be assigned to a processor. 
+• Terminated. The process has finished execution. 
+It is important to realize that only one process can be running on any processor at any instant. 
+Many processes may be ready and waiting, however. The state diagram corresponding  to 
+these states is presented in Figure 3.2. 
+ 
+2.3 Process Control Block 
+Each process is represented in the operating system by a process control block (PCB)—also 
+called a task control block . A PCB is shown in Figure 3.3. It contains  many pieces of 
+information associated with a specific process, including these: 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 3 
+ 
+ 
+Process state. The state may be new, ready, running, and waiting, halted, and so on. 
+• Program counter. The counter indicates the address of the next instruction  to be executed 
+for this process. 
+• CPU registers . The registers vary in number and type, depending on  the computer 
+architecture. They include accumulators, index registers,  stack pointers, and general-purpose 
+registers, plus any condition -code information. Along with the program counter, this state 
+information must  be saved when an interrupt o ccurs, to allow the process to be continued  
+correctly afterward (Figure 3.4). 
+• CPU-scheduling information . This information includes a process priority,  pointers to 
+scheduling queues, and any other scheduling parameters. 
+• Memory-management information. This information may include such  items as the value 
+of the base and limit registers and the page tables, or the  segment tables, depending on the 
+memory system used by the operating system. 
+•Accounting information. This information includes the amount of CP U and real time used, 
+time limits, account numbers, job or process numbers, and so on. 
+• I/O status information . This information includes the list of I/O devices  allocated to the 
+process, a list of open files, and so on. 
+In brief, the PCB simply serves as the repository for any information that may  vary from 
+process to process. 
+ 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 4 
+ 
+ 
+Threads 
+The process model discussed so far has implied that a process is a program that  performs a 
+single thread of execution. For example, when a process is running a word -processor 
+program, a single thread of instructions is being executed.  This single thread of control allows 
+the process to perform only one task at  a time. The user cannot simultaneously type in 
+characters and run the spell  checker within the  same process, for example. Most modern 
+operating systems  have extended the process concept to allow a process to have multiple 
+threads of execution and thus to perform more than one task at a time. This feature  is 
+especially beneficial on multicore systems, where multiple threads can run in parallel. 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 5 
+ 
+ 
+2.4 Operations on Processes 
+The processes in most systems can execute concurrently, and they may  be created and 
+deleted dynamically. 
+Process Creation 
+During the course of execution, a process may create several new processes. As  mentioned 
+earlier, the creating process is called a parent process, and the new  processes are called the 
+children of that process. Each of these new processes  may in turn create other processes, 
+forming a tree of processes. Most operating systems (including UNIX, Linux, and Windows) 
+identify processes according to a unique process identifier (or pid), which is typically  an 
+integer number. The pid provides a unique value for each process in the  system, and it can be 
+used as an index to access various attributes of a process within the kernel. 
+When a process creates a new process, two possibilities for execution exist: 
+1. The parent continues to execute concurrently with its children. 
+2. The parent waits until some or all of its children have terminated. 
+Process Termination 
+A process terminates when it finishes executing its final statement and asks the  operating 
+system to delete it by using the exit() system call. At that point, the  process may return a 
+status value (typically an integer) to its parent process  (via the wait() system call). All the 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 6 
+ 
+resources of the process —including physical and virtual memory, open files, and I/O 
+buffers—are deallocated by the operating system. 
+ 
+A parent may terminate the execution of one of its children for a variety of  reasons, 
+such as these: 
+• The child has exceeded its usage of some of the resources that it has been  allocated. (To 
+determine whether this has occurred, the parent must have  a mechanism to inspect the state 
+of its children.) 
+• The task assigned to the child is no longer required. 
+• The parent is exiting, and the operating system does not allow a child to  continue if its 
+parent terminates. 
+Some systems do not allow a child to exist if its parent has terminated. In  such systems, if a 
+process terminates (either normally or abnormally), then  all its children must also be 
+terminated. This phenomenon, referred to as cascading termination, is normally initiated by 
+the operating system.  A process that has terminated, but whose parent ha s not yet called 
+wait(), is  known as a zombie process. All processes transition to this state when they  
+terminate, but generally they exist as zombies only briefly. 
+ 
+2.2 Inter process Communication 
+Processes executing concurrently in the operating system may be either  independent 
+processes or cooperating processes. A process is independent if it cannot affect or be affected 
+by the other processes executing in the system. Any process that does not share data with any 
+other process is independent. A process is cooperating if it can affect or be affected by the 
+other processes  executing in the system. Clearly, any process that shares data with other  
+processes is a cooperating process. 
+There are several reasons for providing an environment that allows process cooperation: 
+• Information sharing . Since several users may be interested in the same  piece of 
+information (for instance, a shared file), we must provide an environment to allow concurrent 
+access to such information. 
+• Computation spe edup. If we want a particular task to run faster, we must  break it into 
+subtasks, each of which will be executing in parallel with the  others. Notice that such a 
+speedup can be achieved only if the computer has multiple processing cores. 
+• Modularity. We may want to construct the system in a modular fashion, dividing the system 
+functions into separate processes or threads. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 7 
+ 
+• Convenience. Even an individual user may work on many tasks at the  same time. For 
+instance, a user may be editing, listening to music, and compiling in parallel. 
+ 
+Cooperating processes require an inter process communication (IPC) mechanism 
+that will allow them to exchange data and information. There are two  fundamental models of 
+inter process communication: shared memory and message passing. In the shared-memory 
+model, a region of memory that is shared  by cooperating processes is established. Processes 
+can then exchange information  by reading and writing data to the shared region. In the 
+message-passing model, communication takes place by means of messages exchanged 
+between the cooperating processes. 
+ 
+The two communications models are contrasted in Figure 3.12. 
+ 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 8 
+ 
+ 
+To illustrate the concept of cooperating processes, let’s consider the  producer–consumer 
+problem, which is a common paradigm for cooperating  processes. A producer process 
+produces information that is consumed by a  consumer process. For example, a compiler may 
+produce assembly code that  is consumed by an assembler. The assembler, in turn, may 
+produce object modules that are consumed by the loader.  
+ 
+One solution to the producer –consumer problem uses shared memory. To  allow 
+producer and consumer processes to run concurrently, we must have  available a buffer of 
+items that can be filled by the producer and emptied by the consumer. This buffer will reside 
+in a region of memory that is shared by  the producer and consumer processes. A producer 
+can produce one item while  the consumer is consuming another item. The producer and 
+consumer must be synchronized, so that the consumer does not try to consume an item that 
+has not yet been produced. 
+Two types of buffers can be used. The unbounded buffer places no practical limit on 
+the size of the buffer. The consumer may have to wait for new items,  but the producer can 
+always produce new items. The bounded buffer assumes a fixed buffer size. In this case, the 
+consumer must wait if the buffer is empty, and the producer must wait if the buffer is full. 
+ 
+Message passing provides a mechanism to allow pro cesses to communicate  and to 
+synchronize their actions without sharing the same address space. It is particularly useful in a 
+distributed environment, where the communicating  processes may reside on different 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 9 
+ 
+computers connected by a network. For example, an Internet chat program could be designed 
+so that chat participants communicate with one another by exchanging messages.  A message-
+passing facility provides at least two operations: 
+send(message) receive(message) 
+Messages sent by a process can be either f ixed or variable in size.  Message passing may be 
+either blocking or nonblocking— also known as synchronous and asynchronous. 
+• Blocking send . The sending process is blocked until the message is  received by the 
+receiving process or by the mailbox. 
+• Nonblocking send. The sending process sends the message and resumes operation. 
+• Blocking receive. The receiver blocks until a message is available. 
+• Nonblocking receive. The receiver retrieves either a valid message or a null. 
+ 
+ 2.3 Process Scheduling 
+The objective of multiprogramming is to have some process running at all  times, to maximize 
+CPU utilization. The objective of time sharing is to switch the  CPU among processes so 
+frequently that users can interact with each program while it is r unning. To meet these 
+objectives, the process scheduler selects an available process (possibly from a set of several 
+available processes) for  program execution on the CPU. For a single -processor system, there 
+will never be more than one running process. If  there are more processes, the rest will have 
+to wait until the CPU is free and can be rescheduled. 
+ 
+Scheduling Queues 
+As processes enter the system, they are put into a job queue, which consists of all processes 
+in the system. The processes that are resid ing in main memory  and are ready and waiting to 
+execute are kept on a list called the ready queue. This queue is generally stored as a linked 
+list. A ready -queue header contains  pointers to the first and final PCBs in the list. Each PCB 
+includes a pointer field that points to the next PCB in the ready queue. The list of processes 
+waiting for a particular I/O device is called a device queue. 
+ 
+A common representation of process scheduling is a queueing diagram, such as that 
+in Figure 3.6. Each rectangular box represents a queue. Two types  of queues are present: the 
+ready queue and a set of device queues. The circles  represent the resources that serve the 
+queues, and the arrows indicate the flow of processes in the system. 
+ 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 10 
+ 
+A new process is initially put in the ready queue. It waits there until it is  selected for 
+execution, or dispatched. Once the process is allocated the CPU  and is executing, one of 
+several events could occur: 
+• The process could issue an I/O request and then be placed in an I/O queue. 
+• The process could create a new child process and wait for the child’s termination. 
+• The process could be removed forcibly from the CPU, as a result of an  interrupt, and be put 
+back in the ready queue. 
+ 
+Schedulers 
+A process migrates among the various scheduling queues throughout its  lifetime. The 
+operating system must select, for scheduling purposes, processes  from these queues in some 
+fashion. The selection process is carried out by the appropriate scheduler. 
+ 
+Often, in a batch syste m, more processes are submitted than can be executed  
+immediately. These processes are spooled to a mass -storage device (typically a  disk), where 
+they are kept for later execution. The long-term scheduler , or job scheduler, selects 
+processes from this pool and loads them into memory for execution. The short-term 
+scheduler, or CPU scheduler , selects from among  the processes that are ready to execute 
+and allocates the CPU to one of them.  The long-term scheduler executes much less frequently; 
+minutes may separate the creation of one new process and the next. The long -term scheduler 
+controls the degree of multiprogramming (the number of processes in memory). 
+ 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 11 
+ 
+It is important that the long -term scheduler make a careful selection. In  general, most 
+processes can be described as either I/O bound or CPU bound.  An I/O-bound process is one 
+that spends more of its time doing I/O than  it spends doing computations. A CPU-bound 
+process, in contrast, generates  I/O requests infrequently, using more of its time doing 
+computations. It is  important that the long -term scheduler select a good process mix of I/O-
+bound and CPU -bound processes. The  system with the best performance will thus have a 
+combination of CPU-bound and I/O-bound processes. 
+ 
+Context Switch 
+Interrupts cause the operating system to change  a CPU from its current task and to run a 
+kernel routine. Such operations happen  frequently on general -purpose systems. When an 
+interrupt occurs, the system  needs to save the current context of the process running on the 
+CPU so that it can restore that context when its processing is done, essentially suspending the 
+process and then resuming it. 
+Switching the CPU to another process requires performing a state save of  the current 
+process and a state restore of a different process . This task is known  as a context switch . 
+When a context switch occurs, the kernel saves the context  of the old process in its PCB and 
+loads the saved context of the new process  scheduled to run. Context-switch times are highly 
+dependent on hardware support.  
+ 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 12 
+ 
+2.4 Process synchronization 
+A situation where  several processes access and manipulate the same data concurrently and 
+the outcome of the execution depends on the particular order in which the access  takes place, 
+is called a race condition . To guard against the race condition  we need to ensure that only 
+one process at a time can be manipulating the variable counter. To make such a guarantee, we 
+require that the processes be synchronized in some way. 
+ 
+2.4.1 The Critical-Section Problem 
+We begin our consideration of process synchronization by discussing the so  called critical-
+section problem. Consider a system consisting of n processes {P0, P1, ..., Pn−1}. Each process 
+has a segment of code, called a critical section , in which the process may be changing 
+common variables, updating a table,  writing a file, and so on. The important feature of the 
+system is that, when  one process is executing in its critical section, no other process is 
+allowed to  execute in its critical section. That is, no two processes are executing in their  
+critical sections at the same time. The critical-section problem is to design a  protocol that 
+the processes can use to cooperate. Each  process must request permission to enter its critical 
+section. 
+ 
+The section of code implementing this request is the entry section. The critical section 
+may be followed by an exit section. The remaining code is the remainder section . The 
+general structure of  a typical process Pi is shown in Figure 5.1. The entry section and exit 
+section are enclosed in boxes to highlight these important segments of code. 
+ 
+A solution to the critical-section problem must satisfy the following three requirements: 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 13 
+ 
+1. Mutual exclusion. If process Pi is executing in its critical section, then no  other processes 
+can be executing in their critical sections. 
+2. Progress. If no process is executing in its critical section and some  processes wish to enter 
+their critical sect ions, then only those processes  that are not executing in their remainder 
+sections can participate in deciding which will enter its critical section next, and this selection 
+cannot be postponed indefinitely. 
+3. Bounded waiting . There exists a bound, or limit, on the number of times  that other 
+processes are allowed to enter their critical sections after a  process has made a request to 
+enter its critical section and before that request is granted. 
+ 
+Two general approaches are used to handle critical sections in operating systems:  
+1) Preemptive kernels and  
+2) non-Preemptive kernels.  
+A preemptive ( preemption is the act of temporarily interrupting a task being carried 
+out by a  computer system) kernel allows a process to be preempted while it is running in 
+kernel mode. A  nonpreemptive kernel does not allow a process running in k ernel mode to 
+preempted; a kernel -mode process will run until it exits kernel mode, blocks,  or voluntarily 
+yields control of the CPU. 
+ 
+2.4.2 Peterson’s Solution 
+A classic software -based solution to the critical -section problem known as Peterson’s 
+solution. Because of the way modern computer  architectures perform basic machine -
+language instructions, such as load and store, there are no guarantees that Peterson’s solution 
+will work correctly on  such architectures. However,  we present the solution because it 
+provides a good algorithmic description of solving the critical-section problem and illustrates  
+some of the complexities involved in designing softwa re that addresses the  requirements of 
+mutual exclusion, progress, and bounded waiting. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 14 
+ 
+ 
+ 
+Peterson’s Solution is a classical software based solution to the critical section problem.  In 
+Peterson’s solution, we have two shared variables: 
+ 
+    boolean flag[i] :Initialized to FALSE, initially no one is interested in entering the critical 
+section 
+    int turn : The process whose turn is to enter the critical section. 
+ 
+// code for producer (j)  
+// producer j is ready  
+// to produce an item  
+flag[j] = true;  
+   
+// but consumer (i) can consume an item  
+turn = i;  
+   
+// if consumer is ready to consume an item  
+// and if its consumer's turn  
+while (flag[i] == true && turn == i)  
+      {  
+// then producer will wait }  
+      // otherwise producer will produce  
+    // an item and put it into buffer (critical Section)  
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 15 
+ 
+   
+    // Now, producer is out of critical section  
+    flag[j] = false;  
+    // end of code for producer   
+    //--------------------------------------------------------  
+    // code for consumer i  
+    // consumer i is ready  
+    // to consume an item  
+    flag[i] = true;  
+    // but producer (j) can produce an item  
+    turn = j;  
+   
+    // if producer is ready to produce an item  
+    // and if its producer's turn  
+    while (flag[j] == true && turn == j)  
+        {  
+// then consumer will wait }   
+        // otherwise consumer will consume  
+        // an item from buffer (critical Section)  
+        // Now, consumer is out of critical section  
+        flag[i] = false;  
+// end of code for consumer 
+ 
+Explanation of Peterson’s algorithm – 
+Peterson’s Algorithm is used to synchronize two processes. It uses two variables, a bool array 
+flag of size 2 and an int variable turn to accomplish it. In the solution i represents the 
+Consumer and j represents the Producer. Initially the flags are false.  When a process wants to 
+execute it’s critical section, it sets it’s flag to true and turn as the index of the other process. 
+This means that the process wants to execute but it will allow the other process to run first. 
+The process performs busy waiting u ntil the other process has finished it’s own critical 
+section. 
+After this the current process enters it’s critical section and adds or removes a random 
+number from the shared buffer. After completing the critical section, it sets it’s own flag to 
+false, indication it does not wish to execute anymore. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 16 
+ 
+ 
+Synchronization Hardware 
+However, as mentioned, software -based solutions such as Peterson’s  are not guaranteed to 
+work on modern computer architectures. In the following  discussions, we explore several 
+more solutions to the critical -section problem  using techniques ranging from hardware to 
+software-based APIs available to  both kernel developers and application programmers. All 
+these solutions are  based on the premise of locking —that is, protecting criti cal regions 
+through the use of locks. 
+ 
+Mutex Locks 
+operating-systems designers build software tools to  solve the critical -section problem. The 
+simplest of these tools is the mutex lock. (In fact, the term mutex is short for mutual 
+exclusion.) We use the mutex lock to protect critical regions and thus prevent race conditions. 
+That is, a  process must acquire the lock before entering a critical section; it releases the  lock 
+when it exits the critical section. The acquire()function acquires the lock,  and the release() 
+function releases the lock. 
+ 
+A mutex lock has a boolean variable available whose value indicates if  the lock is 
+available or not. If the lock is available, a call to acquire() succeeds, and the lock is then 
+considered unavailable. A process that attempts to acquire  an unavailable lock is blocked 
+until the lock is released. 
+ 
+The definition of acquire() is as follows: 
+acquire() { 
+while (!available) 
+; /* busy wait */ 
+available = false;; 
+} 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 17 
+ 
+ 
+The definition of release() is as follows: 
+release() { 
+available = true; 
+} 
+The main disadvantage of the implementation given here is that it requires  busy waiting . 
+While a process is in its critical section, any other process that  tries to enter its critical section 
+must loop continuously in the call to acquire(). In fact, this type of mutex lock is also called a 
+spinlock because the process “spins” while waiting for the lock to become available. 
+ 
+Semaphores 
+Mutex locks, as we menti oned earlier, are generally considered the simplest of  
+synchronization tools. In this section, we examine a more robust tool that can behave 
+similarly to a mutex lock but can also provide more sophisticated ways  for processes to 
+synchronize their activities. 
+A semaphore S is an integer variable that, apart from initialization, is  accessed only 
+through two standard atomic operations: wait() and signal(). The wait() operation was 
+originally termed P; signal() was originally called V . The definition of wait() is as follows: 
+wait(S) { 
+while (S <= 0) 
+; // busy wait 
+S--; 
+} 
+The definition of signal() is as follows: 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 18 
+ 
+signal(S) { 
+S++; 
+} 
+All modifications to the integer value of the semaphore in the wait() and signal() operations 
+must be executed indivisibly. That is, when one process  modifies the semaphore value, no 
+other process can simultaneously modify  that same semaphore value. In add ition, in the case 
+of wait(S), the testing of the integer value of S (S ≤ 0), as well as its possible modification (S--), 
+must be executed without interruption. 
+ 
+Semaphore Usage 
+Operating systems often distinguish between counting and binary semaphores. The value of a 
+counting semaphore can range over an unrestricted domain.  The value of a binary 
+semaphore can range only between 0 and 1. Thus, binary  semaphores behave similarly to 
+mutex locks. In fact, on systems that do not  provide mutex lock s, binary semaphores can be 
+used instead for providing mutual exclusion. 
+ 
+Counting semaphores can be used to control access to a given resource  consisting of a 
+finite number of instances. The semaphore is initialized to the  number of resources available. 
+Each process that wishes to use a resource  performs a wait() operation on the semaphore 
+(thereby decrementing the count). When a process releases a resource, it performs a signal() 
+operation (incrementing the count). When the count for the semaphore goes to  0, all  
+resources are being used. After that, processes that wish to use a resource will  block until the 
+count becomes greater than 0. 
+ 
+We can also use semaphores to solve various synchronization problems.  For example, 
+consider two concurrently running pro cesses: P1 with a statement  S1 and P2 with a 
+statement S2. Suppose we require that S2 be executed only  after S1 has completed. We can 
+implement this scheme readily by letting P1 and P2 share a common semaphore synch, 
+initialized to 0. In process P1, we insert the statements  
+S1; 
+signal(synch); 
+In process P2, we insert the statements 
+wait(synch); 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 19 
+ 
+S2; 
+Because synch is initialized to 0, P2 will execute S2 only after P1 has invoked  signal(synch), 
+which is after statement S1 has been executed. 
+ 
+Deadlocks and Starvation 
+ The implementation of a semaphore with a waiting queue may result in a  situation 
+where two or more processes are waiting indefinitely for an event  that can be caused only by 
+one of the waiting processes. The event in question  is the execution of a signal() operation. 
+When such a state is reached, these processes are said to be deadlocked. 
+To illustrate this, consider a system consisting of two processes, P0 and P1, each accessing 
+two semaphores, S and Q, set to the value 1: 
+ 
+Suppose that P0 executes wait(S) and then P1 executes wait(Q).When P0 executes wait(Q), it 
+must wait until P1 executes signal(Q). Similarly, when  P1 executes wait(S), it must wait until 
+P0 executes signal(S). Since these signal() operations cannot be executed, P0 and P1 are 
+deadlocked. We say that a set of processes is in a deadlocked state when every process  in the 
+set is waiting for an event that can be caused only by another process in the set. 
+ 
+Another problem related to deadlocks is indefinite blocking or starvation, a 
+situation in which processes wait indefinitely within the semaphore. Indefinite  blocking may 
+occur if we remove processes from the list associated with a  semaphore in LIFO (last-in, first-
+out) order. 
+ 
+Priority Inversion 
+A scheduling challenge arises when a higher -priority process needs to read  or modify kernel 
+data that are currently being accessed by a lower -priority process—or a chain of lower -
+priority processes. Since ker nel data are typically  protected with a lock, the higher -priority 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 20 
+ 
+process will have to wait for a  lower-priority one to finish with the resource. The situation 
+becomes more  complicated if the lower -priority process is preempted in favor of another  
+process with a higher priority. 
+ 
+As an example, assume we have three processes—L, M, and H—whose priorities follow 
+the order L < M < H. Assume that process H requires resource R, which is currently being 
+accessed by process L. Ordinarily, process  H would wait for L to finish using resource R. 
+However, now suppose that  process M becomes runnable, thereby preempting process L. 
+Indirectly, a process with a lower priority—process M—has affected how long process H must 
+wait for L to relinquish resource R. This problem is known as priority inversion. It occurs 
+only in systems with more than two priorities, so one solution is to have only two priorities. 
+ 
+Classic Problems of Synchronization 
+Bounded Buffer Problem 
+Bounded buffer problem, which is also called  producer consumer problem , is one of the 
+classic problems of synchronization. Let's start by understanding the problem here, before 
+moving on to the solution and program code. 
+What is the Problem Statement? 
+There is a buffer of  n slots and each slot is capable of storing one unit of data. There are two 
+processes running, namely, producer and consumer, which are operating on the buffer. 
+ 
+Bounded Buffer Problem 
+A producer tries to insert data into an empty slot of the buffer. A consumer tries to remove 
+data from a filled slot in the buffer. As you might have guessed by now, those two processes 
+won't produce the expected output if they are being executed concurrently. 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 21 
+ 
+There needs to be a way to make the producer and consumer work in an independent 
+manner. 
+Here's a Solution 
+One solution of this problem is to use semaphores. The semaphores which will be used here 
+are: 
+• m, a binary semaphore which is used to acquire and release the lock. 
+• empty, a  counting semaphore  whose initial value is the number of slots in the buffer, 
+since, initially all slots are empty. 
+• full, a counting semaphore whose initial value is 0. 
+At any instant, the current value of empty repres ents the number of empty slots in the buffer 
+and full represents the number of occupied slots in the buffer. 
+The Producer Operation 
+The pseudocode of the producer function looks like this: 
+do  
+{ 
+    // wait until empty > 0 and then decrement 'empty' 
+    wait(empty);    
+    // acquire lock 
+    wait(mutex);   
+        /* perform the insert operation in a slot */ 
+        // release lock 
+    signal(mutex);   
+    // increment 'full' 
+    signal(full);    
+}  
+while(TRUE); 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 22 
+ 
+• it decrements the empty semaphore because, there will now be one less empty slot, since 
+the producer is going to insert data in one of those slots. 
+• Then, it acquires lock on the buffer, so that the consumer cannot access the buffer until 
+producer completes its operation. 
+• After performing the insert operation, the lock is released and the value of  full is 
+incremented because the producer has just filled a slot in the buffer. 
+The Consumer Operation 
+The pseudocode for the consumer function looks like this: 
+do  
+{ 
+    // wait until full > 0 and then decrement 'full' 
+    wait(full); 
+    // acquire the lock 
+    wait(mutex);   
+        /* perform the remove operation in a slot */  
+        // release the lock 
+    signal(mutex);  
+    // increment 'empty' 
+    signal(empty);  
+}  
+while(TRUE); 
+• The consumer waits until there is at least one full slot in the buffer. 
+• Then it decrements the  full semaphore because the number of occupied slots will be 
+decreased by one, after the consumer completes its operation. 
+• After that, the consumer acquires lock on the buffer. 
+• Following that, the consumer completes the removal operation so that the data from one 
+of the full slots is removed. 
+• Then, the consumer releases the lock. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 23 
+ 
+• Finally, the  empty semaphore is incremented by 1, because the consumer has just 
+removed data from an occupied slot, thus making it empty. 
+What is Readers Writer Problem? 
+Readers writer problem is another example of a classic synchronization problem. There are 
+many variants of this problem, one of which is examined below. 
+The Problem Statement 
+There is a shared resource which should be accessed by multiple processes. There are two 
+types of processes in this context. They are  reader and writer. Any number of  readers can 
+read from the shared resource simultaneously, but only one  writer can write to the shared 
+resource. When a  writeris writing data to the resource, no other process can access the 
+resource. A  writer cannot write to the resource if there are non-zero number o f readers 
+accessing the resource at that time. 
+The Solution 
+From the above problem statement, it is evident that readers have higher priority than writer. 
+If a writer wants to write to the resource, it must wait until there are no readers currently 
+accessing that resource. 
+Here, we use one  mutex m and a  semaphore w. An integer variable  read_count is used to 
+maintain the number of readers currently accessing the resource. The variable  read_count is 
+initialized to 0. A value of 1 is given initially to m and w. 
+Instead of having the process to acquire lock on the shared resource, we use the mutex  m to 
+make the process to acquire and release lock whenever it is updating the read_count variable. 
+The code for the writer process looks like this: 
+while(TRUE)  
+{ 
+    wait(w); 
+   /* perform the write operation */ 
+   signal(w); 
+} 
+And, the code for the reader process looks like this: 
+while(TRUE)  
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 24 
+ 
+{ 
+    //acquire lock 
+    wait(m); 
+    read_count++; 
+    if(read_count == 1) 
+        wait(w); 
+        //release lock   
+    signal(m);   
+        /* perform the reading operation */ 
+        // acquire lock 
+    wait(m);    
+    read_count--; 
+    if(read_count == 0) 
+        signal(w); 
+         
+    // release lock 
+    signal(m);   
+} 
+Here is the Code uncoded(explained) 
+• As seen above in the code for the writer, the writer just waits on the  w semaphore until it 
+gets a chance to write to the resource. 
+• After performing the write operation, it increments  w so that the next writer can access 
+the resource. 
+• On the other hand, in the code for the reader, the lock is acquired whenever 
+the read_count is updated by a process. 
+• When a reader wants to access the resource, first it increments the  read_count value, 
+then accesses the resource and then decrements the read_count value. 
+• The semaphore w is used by the first reader which enters the critical section and the last 
+reader which exits the critical section. 
+• The reason for this is, when the first readers enters the critical section, the writer is 
+blocked from the resource. Only new readers can access the resource now. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 25 
+ 
+• Similarly, when the last reader exits the critical section, it signals the writer using 
+the w semaphore because there are zero readers now and a writer can have the chance to 
+access the resource. 
+Dining Philosophers Problem 
+The dining philosophers problem is another classic synchronization problem which is used to 
+evaluate situations where there is a need of allocating multiple resources to multiple 
+processes. 
+What is the Problem Statement? 
+Consider there are five philosophers sitting around a circular dining table. The dining table 
+has five chopsticks and a bowl of rice in the middle as shown in the below figure. 
+ 
+Dining Philosophers Problem 
+At any instant, a philosopher is either eating or thinking. When a philosopher wants to eat, he 
+uses two chopsticks - one from their left and one from their right. When a philosopher wants 
+to think, he keeps down both chopsticks at their original place. 
+ 
+Here's the Solution 
+From the problem sta tement, it is clear that a philosopher can think for an indefinite amount 
+of time. But when a philosopher starts eating, he has to stop at some point of time. The 
+philosopher is in an endless cycle of thinking and eating. 
+An array of five semaphores, stick[5], for each of the five chopsticks. 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 26 
+ 
+The code for each philosopher looks like: 
+while(TRUE)  
+{ 
+    wait(stick[i]); 
+    /*  
+        mod is used because if i=5, next  
+        chopstick is 1 (dining table is circular) 
+    */ 
+    wait(stick[(i+1) % 5]);   
+                      /* eat */ 
+    signal(stick[i]); 
+       signal(stick[(i+1) % 5]);  
+    /* think */ 
+} 
+When a philosopher wants to eat the rice, he will wait for the chopstick at his left and picks up 
+that chopstick. Then he waits for the right chopstick to be available, and then picks it too. 
+After eating, he puts both the chopsticks down. 
+But if all five philosophers are hungry simultaneously, and each of them pickup one chopstick, 
+then a deadlock situation occurs because they will be waiting f or another chopstick forever. 
+The possible solutions for this are: 
+• A philosopher must be allowed to pick up the chopsticks only if both the left and right 
+chopsticks are available. 
+• Allow only four philosophers to sit at the table. That way, if all the four  philosophers pick 
+up four chopsticks, there will be one chopstick left on the table. So, one philosopher can 
+start eating and eventually, two chopsticks will be available. In this way, deadlocks can be 
+avoided. 
+Process Synchronization | Monitors 
+Monitor i s one of the ways to achieve Process synchronization. Monitor is supported by 
+programming languages to achieve mutual exclusion between processes. For example Java 
+Synchronized methods. Java provides wait() and notify() constructs. 
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 27 
+ 
+1. It is the collection of condition variables and procedures combined together in a 
+special kind of module or a package. 
+2. The processes running outside the monitor can’t access the internal variable of 
+monitor but can call procedures of the monitor. 
+3. Only one process at a time can execute code inside monitors. 
+Syntax of Monitor 
+ 
+Condition Variables 
+Two different operations are performed on the condition variables of the monitor. 
+1. Wait. 
+2. signal. 
+let say we have 2 condition variables 
+condition x, y; //Declaring variable 
+Wait operation 
+x.wait() : Process performing wait operation on any condition variable are suspended. The 
+suspended processes are placed in block queue of that condition variable. 
+Note: Each condition variable has its unique block queue. 
+Signal operation 
+x.signal(): When a process performs signal operation on condition variable, one of the 
+blocked processes is given chance. 
+If (x block queue empty) 
+  // Ignore signal 
+else 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 28 
+ 
+  // Resume a process from block queue. 
+Dining-Philosophers Solution Using Monitors 
+Dining-Philosophers Problem – N philosophers seated around a circular table 
+ 
+• There is one chopstick between each philosopher 
+• A philosopher must pick up its two nearest chopsticks in order to eat 
+• A philosopher must pick up first one chopstick, then the second one, not both at once 
+We need an algorithm for allocating these limited resources(chopsticks) among several 
+processes(philosophers) such that solution is free from deadlock and free from starvation. 
+There exist some algorithm to solve Dining – Philosopher Problem, but they may have 
+deadlock situation. Also, a deadlock -free solution is not necessarily starvation -free. 
+Semaphores can result in deadlock due to programming errors. Monitors alone are not 
+sufficiency to solve this, we need monitors with condition variables 
+ 
+ 
+Monitor-based Solution to Dining Philosophers 
+We illustrate monitor concepts by presenting a deadlock -free solution to the dining-
+philosophers problem. Monitor is used to control access to state variables and condition 
+variables. It only tells when to enter and exit the segment. This solution imposes the 
+restriction that a philosopher may pick up her chopsticks only if both of them are available. 
+To code this solution, we need to distinguish among three states in which we may find a 
+philosopher. For this purpose, we introduce the following data structure: 
+
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 29 
+ 
+THINKING – When philosopher doesn’t want to gain access to either fork. 
+HUNGRY – When philosopher wants to enter the critical section. 
+EATING – When philosopher has got both the forks, i.e., he has entered the section. 
+Philosopher i can set the variable state[i] = EATING only if her two neighbors are not eating  
+(state[(i+4) % 5] != EATING) and (state[(i+1) % 5] != EATING). 
+// Dining-Philosophers Solution Using Monitors  
+monitor DP  
+{  
+ status state[5];  
+ condition self[5];  
+ // Pickup chopsticks  
+ Pickup(int i)  
+ {  
+  // indicate that I’m hungry  
+  state[i] = hungry;  
+  // set state to eating in test()  
+  // only if my left and right neighbors  
+  // are not eating  
+  test(i);  
+  // if unable to eat, wait to be signaled  
+  if (state[i] != eating)  
+   self[i].wait;  
+ }  
+ 
+ // Put down chopsticks  
+ Putdown(int i)  
+ {  
+  // indicate that I’m thinking  
+  state[i] = thinking;  
+  // if right neighbor R=(i+1)%5 is hungry and  
+  // both of R’s neighbors are not eating,  
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 30 
+ 
+  // set R’s state to eating and wake it up by  
+  // signaling R’s CV  
+  test((i + 1) % 5);  
+  test((i + 4) % 5);  
+ }  
+ test(int i)  
+ {  
+  if (state[(i + 1) % 5] != eating  
+   && state[(i + 4) % 5] != eating  
+   && state[i] == hungry) {  
+   // indicate that I’m eating  
+   state[i] = eating;  
+   // signal() has no effect during Pickup(),  
+   // but is important to wake up waiting  
+   // hungry philosophers during Putdown()  
+   self[i].signal();  
+  }  
+ }  
+ init()  
+ {  
+  // Execution of Pickup(), Putdown() and test()  
+  // are all mutually exclusive,  
+  // i.e. only one at a time can be executing  
+for 
+ i = 0 to 4  
+  // Verify that this monitor-based solution is  
+  // deadlock free and mutually exclusive in that  
+  // no 2 neighbors can eat simultaneously  
+  state[i] = thinking;  
+ }  
+UNIT-2 NOTES 
+ 
+Operating Systems  Page 31 
+ 
+} // end of monitor 
+Above Program is a monitor solution to the dining-philosopher problem. 
+We also need to declare 
+condition self[5]; 
+This allows philosopher i to delay herself when she is hungry but is unable to obtain the 
+chopsticks she needs. We are now in a position to describe our solution to the dining -
+philosophers problem. The distribution of the chopsticks is controlled by the monitor Dining 
+Philosophers. Each philosopher, before starting to eat, must invoke the operation pickup(). 
+This act may result in the suspension of the philosopher process. After the successful 
+completion of the operation, the philosopher may eat. Following this, the philosopher invokes 
+the putdown() operation. Thus, philosopher i must invoke the operations pickup() and 
+putdown() in the following sequence: 
+DiningPhilosophers.pickup(i); 
+              ... 
+              eat 
+              ... 
+DiningPhilosophers.putdown(i); 
+It is easy to show that this solution ensures that  no two neighbors are eating simultaneously 
+and that no deadlocks will occur. We note, however, that it is possible for a philosopher to 
+starve to death. 
+ 
+ 

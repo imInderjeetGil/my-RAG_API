@@ -79,11 +79,11 @@ async def upload_status(doc_id: str):
 @router.get("/files")
 def get_uploaded_files():
     results = hashes_collection.get()
-    # files = [
-    #     {"filename": doc, "hash": id}
-    #     for doc, id in zip(results["documents"], results["ids"])
-    # ]
-    return {"files": results["documents"]}
+    files = [
+        {"filename": doc, "hash": id}
+        for doc, id in zip(results["documents"], results["ids"])
+    ]
+    return {"files": files}
 
 @router.delete("/files/{file_hash}")
 async def delete_file(file_hash: str):

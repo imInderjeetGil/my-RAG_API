@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loadSession, username, onLogout }) {
+function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loadSession, username, onLogout, deleteSession, deleteFile }) {
   const [collapsed, setCollapsed] = useState(false);
 
   if (collapsed) {
@@ -12,7 +12,7 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
           title="Expand sidebar"
         >
           {/* Chevron Right SVG */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
         </button>
       </div>
     )
@@ -32,33 +32,40 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
           title="Collapse sidebar"
         >
           {/* Chevron Left SVG */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
       </div>
 
       {/* Content Scroller */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-6">
-        
+
         {/* Section: Documents */}
         <div>
           <div className='px-2 mb-1.5 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-gray-400'>
             {/* Folder SVG */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg>
             <span>Documents</span>
           </div>
           {uploadedFiles.length === 0 ? (
             <p className='px-2 py-1.5 text-xs text-gray-400 italic'>No files uploaded</p>
           ) : (
             <ul className='space-y-0.5'>
-              {uploadedFiles.map((filename, index) => (
+              {uploadedFiles.map((file, index) => (
                 <li
                   key={index}
-                  className='flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg text-gray-600 truncate bg-white/40 border border-gray-200/30'
-                  title={filename}
+                  className='group flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-lg text-gray-600 bg-white/40 border border-gray-200/30'
+                  title={file.filename}
                 >
-                  {/* File Text SVG */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                  <span className="truncate">{filename}</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
+                    <span className="truncate">{file.filename}</span>
+                  </div>
+                  <button
+                    onClick={() => deleteFile(file.hash)}
+                    className='opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0'
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -70,7 +77,7 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
           <div className='px-2 mb-1.5 flex items-center justify-between'>
             <div className="flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-gray-400">
               {/* Message Square SVG */}
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
               <span>Conversations</span>
             </div>
             <button
@@ -79,7 +86,7 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
               title="New Chat"
             >
               {/* Plus SVG */}
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
             </button>
           </div>
           {sessions.length === 0 ? (
@@ -92,14 +99,23 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
                   <li
                     key={session.id}
                     onClick={() => loadSession(session.id)}
-                    className={`group flex items-center gap-2 text-xs px-2.5 py-2 rounded-lg cursor-pointer truncate transition-all duration-150
-                      ${isActive 
-                        ? 'bg-white font-medium text-gray-900 shadow-sm border border-gray-200/50' 
+                    className={`group flex items-center gap-2 text-xs px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150
+    ${isActive
+                        ? 'bg-white font-medium text-gray-900 shadow-sm border border-gray-200/50'
                         : 'text-gray-600 hover:bg-gray-200/50 hover:text-gray-900'
                       }`}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`shrink-0 ${isActive ? 'text-gray-800' : 'text-gray-400'}`}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`shrink-0 ${isActive ? 'text-gray-800' : 'text-gray-400'}`}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                     <span className="truncate flex-1">{session.title || "Untitled Chat"}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteSession(session.id);
+                      }}
+                      className='opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0'
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                    </button>
                   </li>
                 );
               })}
@@ -122,9 +138,9 @@ function Sidebar({ uploadedFiles, sessions, currentSessionId, createSession, loa
           title="Sign Out"
         >
           {/* Logout SVG */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" /></svg>
         </button>
-      </div>  
+      </div>
     </div>
   )
 }

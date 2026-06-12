@@ -18,6 +18,8 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [username, setUsername] = useState(localStorage.getItem("username"));
 
+
+  const API_URL = import.meta.env.VITE_API_URL
   // Login aur Logout ke functions
   function onLogin(newToken, newUsername) {
     localStorage.setItem("token", newToken);
@@ -59,7 +61,7 @@ function App() {
   // Sessions aur Uploaded Files fetch karne ke functions
   async function fetchSessions() {
     try {
-      const response = await fetch("http://localhost:8000/sessions", {
+      const response = await fetch(`${API_URL}/sessions`, {
         headers: authHeaders()
       });
       const data = await response.json();
@@ -70,7 +72,7 @@ function App() {
   }
   async function fetchUploadedFiles() {
     try {
-      const response = await fetch("http://localhost:8000/files");
+      const response = await fetch(`${API_URL}/files`);
       const data = await response.json();
       setUploadedFiles(data.files);
     } catch (error) {
@@ -84,7 +86,7 @@ function App() {
       // Agar current session already empty hai toh naya mat banao
       if (currentSessionId && messages.length === 0) return;
 
-      const response = await fetch("http://localhost:8000/sessions", {
+      const response = await fetch(`${API_URL}/sessions`, {
         method: "POST",
         headers: authHeaders()
       });
@@ -100,7 +102,7 @@ function App() {
   // Session load karne ka function
   async function loadSession(sessionId) {
     try {
-      const response = await fetch(`http://localhost:8000/sessions/${sessionId}/messages`, {
+      const response = await fetch(`${API_URL}/sessions/${sessionId}/messages`, {
         headers: authHeaders()
       });
       const data = await response.json();
@@ -111,11 +113,39 @@ function App() {
     }
   }
 
+  async function deleteSession(sessionId) {
+  try {
+    await fetch(`${API_URL}/sessions/${sessionId}`, {
+      method: "DELETE",
+      headers: authHeaders()
+    });
+    if (currentSessionId === sessionId) {
+      setMessages([]);
+      setCurrentSessionId(null);
+    }
+    fetchSessions();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function deleteFile(fileHash) {
+  try {
+    await fetch(`${API_URL}/files/${fileHash}`, {
+      method: "DELETE",
+      headers: authHeaders()
+    });
+    fetchUploadedFiles();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // Saving chats to DB
   async function saveMessage(sessionId, role, content) {
     if (!sessionId) return;
     try {
-      await fetch(`http://localhost:8000/sessions/${sessionId}/messages`, {
+      await fetch(`${API_URL}/sessions/${sessionId}/messages`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({ role, content }),
@@ -128,7 +158,7 @@ function App() {
   // New session ka title update function
   async function updateSessionTitle(sessionId) {
     try {
-      await fetch(`http://localhost:8000/sessions/${sessionId}/title`, {
+      await fetch(`${API_URL}/sessions/${sessionId}/title`, {
         method: "PATCH",
         headers: authHeaders(),
       });
@@ -141,16 +171,29 @@ function App() {
 
   // CHATS of User and Assistant
   async function addMessage(content) {
+    let sessionId = currentSessionId;
+
+    if (!sessionId) {
+      const response = await fetch(`${API_URL}/sessions`, {
+        method: "POST",
+        headers: authHeaders()
+      });
+      const data = await response.json();
+      sessionId = data.session_id;
+      setCurrentSessionId(sessionId);
+      fetchSessions();
+    }
+
     const newMessage = { id: crypto.randomUUID(),role: "user", content };
     setMessages(prev => [...prev, newMessage]);
-    saveMessage(currentSessionId, "user", content);
+    saveMessage(sessionId, "user", content);
     setIsTyping(true);
 
     const aiMessageId = crypto.randomUUID();
     setMessages(prev => [...prev, { id: aiMessageId, role: "assistant", content: ""}]);
 
     try {
-      const response = await fetch("http://localhost:8000/query", {
+      const response = await fetch(`${API_URL}/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: content }),
@@ -174,7 +217,7 @@ function App() {
       }
 
       if (accumulatedContent.trim()) {
-        await saveMessage(currentSessionId, "assistant", accumulatedContent);
+        await saveMessage(sessionId, "assistant", accumulatedContent);
       }
 
     } catch (error) {
@@ -187,8 +230,8 @@ function App() {
     } finally {
       setIsTyping(false);
     }
-    saveMessage(currentSessionId, "user", content);
-    updateSessionTitle(currentSessionId);
+    saveMessage(sessionId, "user", content);
+    updateSessionTitle(sessionId);
   }
 
 
@@ -199,7 +242,7 @@ function App() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://localhost:8000/upload", { method: "POST",body: formData});
+      const response = await fetch(`${API_URL}/upload`, { method: "POST",body: formData});
       const data = await response.json();
 
       if (!data.doc_id) {
@@ -219,7 +262,7 @@ function App() {
         steps: {}
       }]);
 
-      const eventSource = new EventSource(`http://localhost:8000/upload/status/${data.doc_id}`);
+      const eventSource = new EventSource(`${API_URL}/upload/status/${data.doc_id}`);
 
       eventSource.onmessage = (e) => {
         try {
@@ -287,6 +330,8 @@ function App() {
           loadSession={loadSession}
           username={username}
           onLogout={onLogout}
+          deleteSession={deleteSession}
+          deleteFile={deleteFile}
         />
       </div>
 

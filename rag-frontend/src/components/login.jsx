@@ -6,11 +6,13 @@ function Login({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
   async function handleSubmit() {   
     setLoading(true);
     setError("");
     try {
-      const url = isRegister ? "http://localhost:8000/auth/register" : "http://localhost:8000/auth/login";
+      const url = isRegister ? `${API_URL}/auth/register` : `${API_URL}/auth/login`;
       const body = isRegister
         ? { username: form.username, email: form.email, password: form.password }
         : { email: form.email, password: form.password };

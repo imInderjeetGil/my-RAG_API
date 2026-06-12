@@ -5,4 +5,10 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),tailwindcss()],
+  server: {
+    host: true,
+    allowedHosts: [
+      "strong-bats-leave.loca.lt"
+    ]
+  }
 })

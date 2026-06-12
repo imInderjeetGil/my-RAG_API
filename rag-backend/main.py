@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import upload, query, chat
+from routers import upload, query, chat, auth
 
 app = FastAPI(title="RAG API")
 
@@ -12,6 +12,7 @@ app.add_middleware(
 )
 
 app.include_router(upload.router)
+app.include_router(auth.router)
 app.include_router(query.router)
 app.include_router(chat.router)
 

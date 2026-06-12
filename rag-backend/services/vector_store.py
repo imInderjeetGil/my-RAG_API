@@ -15,10 +15,11 @@ def file_already_exists(file_hash: str) -> bool:
     results = hashes_collection.get(ids=[file_hash])
     return len(results["ids"]) > 0
 
-def save_file_hash(file_hash: str, filename: str):
+def save_file_hash(file_hash: str, filename: str, doc_id: str):
     hashes_collection.add(
         documents=[filename],
-        ids=[file_hash]
+        ids=[file_hash],
+        metadatas=[{"doc_id": doc_id}]
     )
 
 def get_file_hash(contents: bytes) -> str:

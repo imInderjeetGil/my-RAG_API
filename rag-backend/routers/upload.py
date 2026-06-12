@@ -4,7 +4,7 @@ import uuid
 import io
 import asyncio
 from PyPDF2 import PdfReader
-from services.vector_store import add_chunks, file_already_exists, save_file_hash,get_file_hash, progress_store,done_store, hashes_collection
+from services.vector_store import add_chunks, file_already_exists, save_file_hash,get_file_hash, progress_store,done_store, hashes_collection, collection
 from config import CHUNK_SIZE, CHUNK_OVERLAP
 
 router = APIRouter()
@@ -41,7 +41,7 @@ def process_document(filename: str, contents: bytes, file_hash: str, doc_id: str
 
     progress_store[doc_id].append('{"type":"step","key":"embed","status":"loading"}')
     add_chunks(chunks, doc_id)
-    save_file_hash(file_hash, filename)
+    save_file_hash(file_hash, filename, doc_id)  # doc_id add kiya
     progress_store[doc_id].append('{"type":"step","key":"embed","status":"done"}')
 
     done_store[doc_id] = True
@@ -84,3 +84,25 @@ def get_uploaded_files():
     #     for doc, id in zip(results["documents"], results["ids"])
     # ]
     return {"files": results["documents"]}
+
+@router.delete("/files/{file_hash}")
+async def delete_file(file_hash: str):
+    # doc_id nikalo metadata se
+    result = hashes_collection.get(ids=[file_hash], include=["metadatas"])
+    
+    if not result["ids"]:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    doc_id = result["metadatas"][0]["doc_id"]
+    
+    # Chunks delete karo ChromaDB se
+    all_ids = collection.get()["ids"]
+    ids_to_delete = [id for id in all_ids if id.startswith(f"{doc_id}_chunk_")]
+    
+    if ids_to_delete:
+        collection.delete(ids=ids_to_delete)
+    
+    # Hash delete karo
+    hashes_collection.delete(ids=[file_hash])
+    
+    return {"message": "File deleted"}

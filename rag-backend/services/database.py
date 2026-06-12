@@ -6,3 +6,4 @@ db = client[MONGO_DB_NAME]
 
 sessions_collection = db["sessions"]
 messages_collection = db["messages"]
+users_collection =  db["users"]

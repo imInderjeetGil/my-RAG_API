@@ -7,3 +7,7 @@ CHUNK_OVERLAP = 50
 
 MONGO_URL = "mongodb://localhost:27017"
 MONGO_DB_NAME = "rag_db"
+
+JWT_SECRET = "aman-is-the-best"
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRY_HOURS = 24

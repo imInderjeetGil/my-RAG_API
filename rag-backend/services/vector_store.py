@@ -3,7 +3,8 @@ import hashlib
 from config import CHROMA_DB_PATH
 from services.embedding import get_embedding
 
-client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+# client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+client = chromadb.HttpClient(host="chromadb", port=8000)
 collection = client.get_or_create_collection(name="documents")
 hashes_collection = client.get_or_create_collection(name="file_hashes")
 

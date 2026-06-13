@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # 1. MongoDB (Auth, Sessions, Chats)
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_rag
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # 2. ChromaDB (Document Embeddings Only)
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chromadb_rag
+    restart: unless-stopped
+    ports:
+      - "8001:8000"  # Exposed on 8001 to prevent conflict with FastAPI (8000)
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+
+  # 3. Ollama (LLM & Embeddings Engine)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_rag
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # 4. Automation to pre-pull models on first boot
+  ollama-pull-models:
+    image: curlimages/curl:latest
+    container_name: ollama_puller
+    depends_on:
+      - ollama
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for Ollama to start...';
+      until curl -s http://ollama:11434/api/tags > /dev/null; do sleep 5; done;
+      echo 'Pulling gemma3:4b...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"gemma3:4b\"}';
+      echo 'Pulling mxbai-embed-large...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"mxbai-embed-large\"}';
+      echo 'Models pulled successfully!';
+      "
+
+  # 5. FastAPI Backend
+  backend:
+    build: ./backend
+    container_name: fastapi_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/your_db_name
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000  # Connects internally via Docker network on port 8000
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - mongodb
+      - chromadb
+      - ollama
+
+  # 6. React Vite Frontend
+  frontend:
+    build: ./frontend
+    container_name: react_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  chroma_data:
+  ollama_data:
